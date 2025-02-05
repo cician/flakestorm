@@ -22,5 +22,28 @@
       };
 
     defaultPackage.x86_64-linux = self.packages.x86_64-linux.default;
+
+    nixosModules.flakestorm = { config, lib, pkgs, ... }: {
+      options.services.flakestorm = {
+        enable = lib.mkEnableOption "Flake Storm Service";
+        package = lib.mkOption {
+          type = lib.types.package;
+          default = pkgs.bash;
+          description = "The package providing the flakestorm executable";
+        };
+      };
+
+      config = lib.mkIf config.services.flakestorm.enable {
+        systemd.services.flakestorm = {
+          description = "Flakestorm Service";
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            ExecStart = "${config.services.flakestorm.package}/bin/bash -c 'echo Flakestorm running'";
+            Restart = "always";
+          };
+        };
+      };
+    };
+
   };
 }
