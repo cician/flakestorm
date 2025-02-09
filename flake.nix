@@ -34,8 +34,8 @@
 
     # Include the microvm host module
     # https://astro.github.io/microvm.nix/host.html
-    microvm = microvm.nixosModules.microvm;
-    microvm_host = microvm.nixosModules.host;
+    nixosModules.microvm = microvm.nixosModules.microvm;
+    nixosModules.microvm_host = microvm.nixosModules.host;
 
     nixosModules.flakestorm = { config, lib, pkgs, ... }: {
       options.services.flakestorm = {
