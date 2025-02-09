@@ -29,6 +29,12 @@
       };
 
     defaultPackage.x86_64-linux = self.packages.x86_64-linux.default;
+    
+    #nixosModules.microvm = microvm.nixosModules.host;
+
+    # Include the microvm host module
+    # https://astro.github.io/microvm.nix/host.html
+    imports = [ microvm.nixosModules.host ];  # Enable MicroVM host module
 
     nixosModules.flakestorm = { config, lib, pkgs, ... }: {
       options.services.flakestorm = {
@@ -50,10 +56,6 @@
             Restart = "always";
           };
         };
-
-        # Include the microvm host module
-        # https://astro.github.io/microvm.nix/host.html
-        imports = [ microvm.nixosModules.host ];  # Enable MicroVM host module
 
         # Enable required host features for microvm like virtiofsd and advanced networking.
         microvm.host.enable = true;
