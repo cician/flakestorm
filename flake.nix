@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, microvm }: {
+  outputs = { self, nixpkgs, microvm }@inputs: {
     packages.x86_64-linux.flakestorm = self.packages.x86_64-linux.default;
 
     packages.x86_64-linux.default = 
@@ -34,7 +34,7 @@
 
     # Include the microvm host module
     # https://astro.github.io/microvm.nix/host.html
-    imports = [ microvm.nixosModules.host ];  # Enable MicroVM host module
+    imports = [ inputs.microvm.nixosModules.host ];  # Enable MicroVM host module
 
     nixosModules.flakestorm = { config, lib, pkgs, ... }: {
       options.services.flakestorm = {
