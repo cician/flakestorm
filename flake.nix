@@ -41,7 +41,7 @@
         enable = lib.mkEnableOption "Flake Storm Service";
         package = lib.mkOption {
           type = lib.types.package;
-          default = pkgs.bash;
+          default = pkgs.packages.x86_64-linux.flakestorm;
           description = "The package providing the flakestorm executable";
         };
       };
