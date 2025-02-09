@@ -3,9 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    microvm = {
+      url = "github:astro/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs, microvm }: {
     packages.x86_64-linux.flakestorm = self.packages.x86_64-linux.default;
 
     packages.x86_64-linux.default = 
@@ -17,7 +22,9 @@
         installPhase = ''
           mkdir -p $out/bin
           cp bin/flakestorm $out/bin/flakestorm
+          cp bin/flakestormd $out/bin/flakestormd
           chmod +x $out/bin/flakestorm
+          chmod +x $out/bin/flakestormd
         '';
       };
 
@@ -36,12 +43,26 @@
       config = lib.mkIf config.services.flakestorm.enable {
         systemd.services.flakestorm = {
           description = "Flakestorm Service";
+          after = [ "network.target" ];
           wantedBy = [ "multi-user.target" ];
           serviceConfig = {
-            ExecStart = "${config.services.flakestorm.package}/bin/bash -c 'echo Flakestorm running'";
+            ExecStart = "${config.services.flakestorm.package}/bin/flakestormd";
             Restart = "always";
           };
         };
+
+        # Include the microvm host module
+        # https://astro.github.io/microvm.nix/host.html
+        imports = [ microvm.nixosModules.host ];  # Enable MicroVM host module
+
+        # Enable required host features for microvm like virtiofsd and advanced networking.
+        microvm.host.enable = true;
+
+        # try to automatically start these MicroVMs on bootup
+        #microvm.autostart = [
+        #  "flakestorm-selfdev"
+        #];
+
       };
     };
 

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "This is a mockup of FlakeStorm daemon"
+
+
+trap cleanup SIGINT SIGQUIT SIGABRT
+
+cleanup()
+{
+  echo "FlakeStorm daemon closed"
+  exit
+}
+
+while true; do
+    #echo "tick"
+    sleep 60
+done
+
